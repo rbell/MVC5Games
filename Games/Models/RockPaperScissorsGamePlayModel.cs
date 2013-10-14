@@ -10,15 +10,17 @@ namespace Games.Models
     {
         public RockPaperScissorsGamePlayModel()
         {
-            Players = new List<RockPaperScissorsPlayer>();
+            //Players = new List<RockPaperScissorsPlayer>();
         }
 
-        public int PlayerCount { get; set; }
+        //public int PlayerCount { get; set; }
 
-        public object PlayerId { get; set; }
+        //public object PlayerId { get; set; }
 
-        public object SessionId { get; set; }
+        public string SessionId { get; set; }
 
-        public List<RockPaperScissorsPlayer> Players { get; set; }
+        public string SessionName { get; set; }
+
+        //public List<RockPaperScissorsPlayer> Players { get; set; }
     }
 }

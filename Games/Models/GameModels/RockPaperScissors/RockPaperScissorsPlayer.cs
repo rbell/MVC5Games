@@ -10,6 +10,8 @@ namespace Games.Models.GameModels.RockPaperScissors
     /// </summary>
     public class RockPaperScissorsPlayer : GamePlayer
     {
+        public RockPaperScissorsPlayer(string playerId) : base(playerId) { }
+
         public string Selection { get; set; }
         public bool isWinner { get; set; }
     }

@@ -11,7 +11,7 @@
     <h3>@ViewBag.Message</h3>
 </hgroup>
 
-<h3>Current Games</h3>
+<h4>Games Waiting for Another Player</h4>
 <div class="dropdown clearfix">
     <ul id="activeGames" class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu" style="display: block; position: static; margin-bottom: 5px; *width: 180px;">
         @foreach (Tuple<string, string> game in Model)
@@ -44,6 +44,11 @@
                 // Add the message to the page.
                 $('#activeGames').append('<li><a tabindex="-1" href="/RockPaperScissors/JoinGame?id=' + id + '">' + encodedText + '</a></li>');
             };
+            
+            rockPaperScissors.client.endGame = function (id) {
+                var select = 'li:has(a[href$=' + id + '])';
+                $('#activeGames').children().remove(select);
+            }
 
             $.connection.hub.start();
         });

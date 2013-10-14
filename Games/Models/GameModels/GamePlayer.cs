@@ -10,6 +10,11 @@ namespace Games.Models.GameModels
     /// </summary>
     public abstract class GamePlayer
     {
+        public GamePlayer(string playerId)
+        {
+            PlayerId = playerId;
+        }
+
         public string PlayerId { get; set; }
         public string Name { get; set; }
     }

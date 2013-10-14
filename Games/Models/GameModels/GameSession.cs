@@ -12,21 +12,21 @@ namespace Games.Models.GameModels
     /// <typeparam name="P">Type of GamePlayer</typeparam>
     public abstract class GameSession<P> where P : GamePlayer
     {
-        private Guid _id = Guid.NewGuid();
+        private string _id = Guid.NewGuid().ToString();
 
         public GameSession(string name)
         {
             Name = name;
-            Players = new Dictionary<string, P>();
+            Players = new List<P>();
         }
 
-        public Guid Id 
+        public string Id 
         { 
             get { return _id; } 
         }
 
         public string Name { get; set; }
 
-        public Dictionary<string, P> Players { get; protected set; }
+        public List<P> Players { get; protected set; }
     }
 }

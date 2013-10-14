@@ -13,22 +13,26 @@ namespace Games.Models.GameModels.RockPaperScissors
         public RockPaperScissorsSession(string name)
             : base(name)
         {
-            Players = new Dictionary<string, RockPaperScissorsPlayer>();
         }
 
         internal RockPaperScissorsPlayer GetWinner()
         {
-            if (Players.Count != 2 || Players.Any(p => p.Value.Selection == null))
+            if (Players.Count() != 2 || Players.Any(p => p.Selection == null))
             {
                 return null;
             }
 
 
-            var playersList = Players.Values.ToList();
-            playersList.ForEach(p => Players[p.PlayerId].isWinner = false);
+            var playersList = Players.ToList();
+            playersList.ForEach(p =>
+                {
+                    p.isWinner = false;
+                });
 
             var winner = comparePlayer(playersList[0], playersList[1]);
-            Players[winner.PlayerId].isWinner = true;
+
+            playersList.First(p => p.PlayerId == winner.PlayerId).isWinner = true;
+
             return winner;
         }
 
