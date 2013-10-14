@@ -40,23 +40,15 @@
                     $('#btnPaper').button('reset');
                     $('#btnScissors').button('reset');
                     $('#status').text('Make your selection now.');
-                }
-            }
+                };
+            };
 
             rockPaperScissors.client.winner = function (player1, player2) {
                 $('#playerSelection0').text('Played ' + player1.Selection);
                 $('#playerSelection1').text('Played ' + player2.Selection);
                 var winnerName = player1.isWinner ? player1.Name : player2.Name;
                 $('#status').text('Winner is ' + winnerName);
-            }
-
-            function playerSelectedValue(v) {
-                rockPaperScissors.server.playerSelectedValue($('#sessionId').val(),$('#playerId').val(),v);
-                $('#btnRock').button('loading');
-                $('#btnPaper').button('loading');
-                $('#btnScissors').button('loading');
-                $('#status').text("Waiting for other players to make selection.");
-            }
+            };
 
             $.connection.hub.start().done(function(){
                 rockPaperScissors.server.joinGame('@Model.SessionId','@Model.SessionName').done(function (joinResults){
@@ -92,8 +84,16 @@
                 $('#btnScissors').click(function () {
                     playerSelectedValue('scissors');
                 });
+
             });
 
+            function playerSelectedValue(v) {
+                rockPaperScissors.server.playerSelectedValue($('#sessionId').val(), $('#playerId').val(), v);
+                $('#btnRock').button('loading');
+                $('#btnPaper').button('loading');
+                $('#btnScissors').button('loading');
+                $('#status').text("Waiting for other players to make selection.");
+            };
 
         });
 </script>
