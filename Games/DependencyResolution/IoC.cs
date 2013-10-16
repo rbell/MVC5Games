@@ -28,8 +28,7 @@ namespace Games.DependencyResolution {
                                         scan.TheCallingAssembly();
                                         scan.WithDefaultConventions();
                                     });
-                            x.ForSingletonOf<RockPaperScissorsGame>().Use<RockPaperScissorsGame>();
-            //                x.For<IExample>().Use<Example>();
+                            x.For<RockPaperScissorsGame>().Singleton().Use<RockPaperScissorsGame>();
                         });
             return ObjectFactory.Container;
         }

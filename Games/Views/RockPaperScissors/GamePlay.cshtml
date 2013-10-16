@@ -15,8 +15,7 @@
 </div>
 <div>
     <h3>Players</h3>
-    <ul id="players">
-    </ul>
+    <ul id="players"></ul>
 </div>
 
 
@@ -30,10 +29,21 @@
 
 
         $(function () {
+
+            var gamesession = '@Model.SessionId';
+
+            // If player started game and is refreshing screen, we need to get the gamesession from their cookie
+            if (document.cookie.indexOf('inGame') != -1) {
+                if (gamesession == '') {
+                    gamesession = getCookie('inGame');
+                }
+            }
+
             rockPaperScissors = $.connection.rockPaperScissorsHub;
 
             rockPaperScissors.client.playerJoined = function (player, playerCount) {
-                if (playerCount > 1) {
+                var playerlisted = $('#players').has('li:contains(' + player.Name + ')');
+                if (playerCount > 1 && !playerlisted.length) {
                     var encodedName = $('<div />').text(player.Name).html();
                     $('#players').append('<li>' + encodedName + '&nbsp;<span id="playerSelection1" class="label label-success"></span></li>');
                     $('#btnRock').button('reset');
@@ -50,15 +60,16 @@
                 $('#status').text('Winner is ' + winnerName);
             };
 
-            $.connection.hub.start().done(function(){
-                rockPaperScissors.server.joinGame('@Model.SessionId','@Model.SessionName').done(function (joinResults){
+            $.connection.hub.start().done(function () {
+                rockPaperScissors.server.joinGame(gamesession, '@Model.SessionName').done(function (joinResults) {
                     $('#sessionId').val(joinResults.Id);
-                    $('#playerId').val($.connection.hub.id);
+                    $('#playerId').val('@User.Identity.Name');
+                    createCookie('inGame', joinResults.Id);
 
                     var playerCount = joinResults.Players.length;
                     for (var i = 0; i < playerCount; i++) {
                         var encodedName = $('<div />').text(joinResults.Players[i].Name).html();
-                        $('#players').append('<li>' + encodedName + '&nbsp;<span id="playerSelection' + i + '" class="label label-success"></span></li>');                       
+                        $('#players').append('<li>' + encodedName + '&nbsp;<span id="playerSelection' + i + '" class="label label-success"></span></li>');
                     }
 
                     if (playerCount <= 1) {
@@ -95,7 +106,33 @@
                 $('#status').text("Waiting for other players to make selection.");
             };
 
+            function createCookie(name, value, expires, path, domain) {
+                var cookie = name + "=" + escape(value) + ";";
+                if (expires) {
+                    // If it's a date
+                    if (expires instanceof Date) {
+                        // If it isn't a valid date
+                        if (isNaN(expires.getTime()))
+                            expires = new Date();
+                    }
+                    else
+                        expires = new Date(new Date().getTime() + parseInt(expires) * 1000 * 60 * 60 * 24);
+                    cookie += "expires=" + expires.toGMTString() + ";";
+                }
+                if (path)
+                    cookie += "path=" + path + ";";
+                if (domain)
+                    cookie += "domain=" + domain + ";";
+                document.cookie = cookie;
+            }
+
+            function getCookie(name) {
+                var regexp = new RegExp("(?:^" + name + "|;\s*" + name + ")=(.*?)(?:;|$)", "g");
+                var result = regexp.exec(document.cookie);
+                return (result === null) ? null : result[1];
+            }
+
         });
-</script>
+    </script>
 }
 

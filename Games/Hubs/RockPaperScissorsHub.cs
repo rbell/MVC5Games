@@ -23,32 +23,38 @@ namespace Games.Hubs
         public RockPaperScissorsSession JoinGame(string sessionId, string sessionName)
         {
             var game = ObjectFactory.GetInstance<RockPaperScissorsGame>();
-            RockPaperScissorsSession session = null;
-            var playerId = Context.ConnectionId;
+            var playerId = Context.User.Identity.Name;
+            RockPaperScissorsSession session = GetSessionForPlayer(playerId);
 
-            if (string.IsNullOrWhiteSpace(sessionId))
+            // Only add player to new or existing game if player is not already in a game
+            if (session == null)
             {
-                // New Game
-                session = new RockPaperScissorsSession(sessionName);
-                session.Players.Add(new RockPaperScissorsPlayer(playerId) {Name = Context.User.Identity.Name });
-                game.Sessions.Add(session);
+                // Try to get game given sessionId
+                session = game.Sessions.FirstOrDefault(g => g.Id.ToString() == sessionId);
+                if (session == null)
+                {
+                    // New Game
+                    session = new RockPaperScissorsSession(sessionName);
+                    session.Players.Add(new RockPaperScissorsPlayer(playerId) { Name = Context.User.Identity.Name });
+                    game.Sessions.Add(session);
 
-                Groups.Add(Context.ConnectionId, session.Id.ToString());
+                    Groups.Add(Context.ConnectionId, session.Id.ToString());
 
-                // Broadcast to other subscribers that there is now a new game
-                Clients.All.newGame(session.Id.ToString(), session.Name);
-            }
-            else
-            {
-                // Player joining existing game
-                session = game.Sessions.First(g => g.Id.ToString() == sessionId);
-                var newPlayer = new RockPaperScissorsPlayer(playerId) { Name = Context.User.Identity.Name };
-                session.Players.Add(newPlayer);
+                    // Broadcast to other subscribers that there is now a new game
+                    Clients.All.newGame(session.Id.ToString(), session.Name);
+                }
+                else
+                {
+                    // Player joining existing game
+                    session = game.Sessions.First(g => g.Id.ToString() == sessionId);
+                    var newPlayer = new RockPaperScissorsPlayer(playerId) { Name = Context.User.Identity.Name };
+                    session.Players.Add(newPlayer);
 
-                Groups.Add(Context.ConnectionId, session.Id.ToString());
+                    Groups.Add(Context.ConnectionId, session.Id.ToString());
 
-                // Broadcast to other clients in this game that a player has joined
-                Clients.Group(session.Id.ToString()).playerJoined(newPlayer, session.Players.Count);
+                    // Broadcast to other clients in this game that a player has joined
+                    Clients.Group(session.Id.ToString()).playerJoined(newPlayer, session.Players.Count);
+                }
             }
 
             return session;
@@ -72,9 +78,9 @@ namespace Games.Hubs
 
         public override System.Threading.Tasks.Task OnDisconnected()
         {
-            var playerId = Context.ConnectionId;
+            var playerId = Context.User.Identity.Name;
             var game = ObjectFactory.GetInstance<RockPaperScissorsGame>();
-            var session = game.Sessions.FirstOrDefault(s => s.Players.Any(p => p.PlayerId == playerId));
+            var session = GetSessionForPlayer(playerId);
             if (session != null)
             {
                 if (session.Players.Any(p => p.PlayerId == playerId))
@@ -89,6 +95,13 @@ namespace Games.Hubs
                 }
             }
             return base.OnDisconnected();
+        }
+
+        private RockPaperScissorsSession GetSessionForPlayer(string playerId)
+        {
+             var game = ObjectFactory.GetInstance<RockPaperScissorsGame>();
+            var session = game.Sessions.FirstOrDefault(s => s.Players.Any(p => p.PlayerId == playerId));
+            return session;
         }
 
     }
