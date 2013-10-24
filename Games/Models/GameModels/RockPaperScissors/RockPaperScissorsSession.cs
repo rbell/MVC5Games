@@ -31,7 +31,10 @@ namespace Games.Models.GameModels.RockPaperScissors
 
             var winner = comparePlayer(playersList[0], playersList[1]);
 
-            playersList.First(p => p.PlayerId == winner.PlayerId).isWinner = true;
+            if (winner != null)
+            {
+                playersList.First(p => p.PlayerId == winner.PlayerId).isWinner = true;
+            }
 
             return winner;
         }

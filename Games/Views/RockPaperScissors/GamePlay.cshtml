@@ -53,12 +53,21 @@
                 };
             };
 
+            rockPaperScissors.client.playerLeft = function (player) {
+                var playerlisted = $('#players').remove('li:contains(' + player.Name + ')');
+            }
+
             rockPaperScissors.client.winner = function (player1, player2) {
-                $('#playerSelection0').text('Played ' + player1.Selection);
-                $('#playerSelection1').text('Played ' + player2.Selection);
-                var winnerName = player1.isWinner ? player1.Name : player2.Name;
-                $('#status').text('Winner is ' + winnerName);
+                if (player1.Selection === player2.Selection) {
+                    $('#status').text('Both players selected ' + player1.Selection + '. Try again!');
+                } else {
+                    $('#playerSelection0').text('Played ' + player1.Selection);
+                    $('#playerSelection1').text('Played ' + player2.Selection);
+                    var winnerName = player1.isWinner ? player1.Name : player2.Name;
+                    $('#status').text('Winner is ' + winnerName);
+                }
             };
+
 
             $.connection.hub.start().done(function () {
                 rockPaperScissors.server.joinGame(gamesession, '@Model.SessionName').done(function (joinResults) {

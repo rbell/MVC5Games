@@ -85,7 +85,9 @@ namespace Games.Hubs
             {
                 if (session.Players.Any(p => p.PlayerId == playerId))
                 {
-                    session.Players.Remove(session.Players.First(p => p.PlayerId == playerId));
+                    var player = session.Players.First(p => p.PlayerId == playerId);
+                    session.Players.Remove(player);
+                    Clients.Group(session.Id).PlayerLeft(player);
                 }
 
                 if (session.Players.Count == 0)
